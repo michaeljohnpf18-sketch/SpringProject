@@ -19,7 +19,9 @@ public class Users {
 
     @Column(name = "access")
     private String access;
+    @Column(name = "email_address", unique = true)
     private String email;
+    @Column(name = "password")
     private String password;
 
     // Constructors
@@ -57,6 +59,7 @@ public class Users {
     }
     
     public String getPassword() {
+        password = password.replaceAll("(?s).", "*");
         return password;
     }
     //GETTERS

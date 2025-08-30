@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.michaelspringproject.store.entities.Users;
 
 @Repository
-public interface UserRepository extends CrudRepository<Users, Long> {
+public interface UserRepository extends CrudRepository<Users, Integer> {
     // Define repository methods here
 }
