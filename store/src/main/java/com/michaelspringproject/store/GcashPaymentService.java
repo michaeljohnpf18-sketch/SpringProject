@@ -1,5 +1,8 @@
 package com.michaelspringproject.store;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class GcashPaymentService implements PaymentService {
 
     @Override
