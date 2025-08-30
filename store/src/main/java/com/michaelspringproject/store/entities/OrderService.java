@@ -1,4 +1,4 @@
-package com.michaelspringproject.store;
+package com.michaelspringproject.store.entities;
 
 import org.springframework.stereotype.Service;
 

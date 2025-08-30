@@ -1,5 +1,4 @@
-package com.michaelspringproject.store;
-
+package com.michaelspringproject.store.entities;
 public class StripePaymentService implements PaymentService {
 
     @Override

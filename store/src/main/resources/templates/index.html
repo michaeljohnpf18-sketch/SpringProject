@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <meta charset="UTF-8">
     <title>SpringProject Store</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +7,7 @@
 </head>
 <body>
     <header>
-        <h1>Welcome to SpringProject Store</h1>
+        <h1 th:text="'Hello ' + ${name} + ', '"></h1>
     </header>
     <main>
         <p>Your one-stop shop for all your needs.</p>
