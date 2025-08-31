@@ -5,11 +5,16 @@ import java.util.Set;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.michaelspringproject.store.dtos.ProductDto;
 import com.michaelspringproject.store.entities.Products;
@@ -17,6 +22,7 @@ import com.michaelspringproject.store.mappers.ProductMapper;
 import com.michaelspringproject.store.repositories.ProductsRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.experimental.var;
 
 @RestController
 @AllArgsConstructor
@@ -27,13 +33,14 @@ public class ProductController {
 
     @GetMapping
     public Iterable<ProductDto> getAllProducts(
-        @RequestParam(required = false, name = "categoryId") Long categoryId
+        @RequestParam(required = false, name = "categoryId") 
+        String sort, Long categoryId
     ) {
         List<Products> products;
         if(categoryId != null) {
             products = productsRepository.findByCategoryId(categoryId);
         } else {
-            products = productsRepository.findAll();
+            products = productsRepository.findAll(Sort.by(sort != null ? sort : "categoryId"));
         }
         return products.stream()
         .map(productMapper::toDto)
@@ -49,5 +56,40 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.toDto(product));
     }
 
+    @PostMapping
+    public ResponseEntity<ProductDto> createProduct(
+        @RequestBody ProductDto request,
+        UriComponentsBuilder uriBuilder) {
+        
+        var product = productMapper.toEntity(request);
+        productsRepository.save(product);
+        var productDto = productMapper.toDto(product);
+        var uri = uriBuilder.path("/products/{id}").buildAndExpand(product.getProductId()).toUri();
+        return ResponseEntity.created(uri).body(productDto);
+    
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDto> updateProduct(
+        @PathVariable Long id,
+        @RequestBody ProductDto request) {
+
+        var product = productsRepository.findById(id).orElse(null);
+        if (product == null) {
+            return ResponseEntity.notFound().build(); // Or throw an exception
+        }
+        productMapper.updateEntity(request, product);
+        productsRepository.save(product);
+        return ResponseEntity.ok(productMapper.toDto(product));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        var product = productsRepository.findById(id).orElse(null);
+        if (product == null) {
+            return ResponseEntity.notFound().build(); // Or throw an exception
+        }
+        productsRepository.delete(product);
+        return ResponseEntity.noContent().build();
+    }
 }

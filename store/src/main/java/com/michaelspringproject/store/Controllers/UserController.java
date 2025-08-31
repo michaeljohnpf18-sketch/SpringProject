@@ -1,4 +1,6 @@
 package com.michaelspringproject.store.Controllers; 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.michaelspringproject.store.dtos.ChangePasswordRequest;
 import com.michaelspringproject.store.dtos.RegisterUserRequest;
 import com.michaelspringproject.store.dtos.UpdateUserRequest;
 import com.michaelspringproject.store.dtos.UserDto;
@@ -80,6 +84,27 @@ public class UserController {
             return ResponseEntity.notFound().build(); // Or throw an exception
         }
         userRepository.delete(user);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<Void> changePassword(
+        @PathVariable Long id, 
+        @RequestBody ChangePasswordRequest request
+        
+    ) {
+        var user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build(); // Or throw an exception
+        }
+        if (!user.getPassword().equals(request.getOldPassword())) {
+            return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Or throw an exception
+        }
+        if (user.getPassword().equals(request.getNewPassword())) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build(); // Or throw an exception
+        }
+        user.setPassword(request.getNewPassword());
+        userRepository.save(user);
         return ResponseEntity.noContent().build();
     }
 }
