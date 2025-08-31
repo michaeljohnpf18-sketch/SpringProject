@@ -14,13 +14,17 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "fullname")
+    private String fullname;
+
     @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "access")
     private String access;
+
     @Column(name = "email_address", unique = true)
-    private String email;
+    private String email_address;
     @Column(name = "password")
     private String password;
 
@@ -29,52 +33,54 @@ public class Users {
 
     }
 
-    public Users(Long id, String username, String email, String access , String password) {
+    public Users(Long id, String fullnmame, String username, String email_address, String access , String password) {
         this.id = id;
+        this.fullname = fullnmame;
         this.username = username;
-        this.email = email;
+        this.email_address = email_address;
         this.access = access;   
         this.password = password;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
+    //Setters
     public void setId(Long id) {
         this.id = id;
     }
-
-    public String getUsername() {
-        return username;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
-
-    public void setAccess(String access) {
-        this.access = access;
-    }
-
     public void setUsername(String username) {
         this.username = username;
     }
-    
-    public String getPassword() {
-        password = password.replaceAll("(?s).", "*");
-        return password;
-    }
-    //GETTERS
-    public String getAccess() {
-        return access;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String email_address) {
+        this.email_address = email_address;
     }
     public void setPassword(String password) {
         this.password = password;
     }
+    public void setAccess(String access) {
+        this.access = access;
+    }
+
+    //GETTERS
+    public Long getId() {
+        return id;
+    }
+    public String getFullname() {
+        return fullname;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public String getEmail() {
+            return email_address;
+        }
+    public String getAccess() {
+        return access;
+    }
+
+    
 }
