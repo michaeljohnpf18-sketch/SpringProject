@@ -2,6 +2,7 @@ package com.michaelspringproject.store.Controllers;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Locale.Category;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.michaelspringproject.store.dtos.ProductDto;
 import com.michaelspringproject.store.entities.Products;
 import com.michaelspringproject.store.mappers.ProductMapper;
+import com.michaelspringproject.store.repositories.CategoryRepository;
 import com.michaelspringproject.store.repositories.ProductsRepository;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +32,7 @@ import lombok.experimental.var;
 public class ProductController {
     private final ProductsRepository productsRepository;    
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
 
     @GetMapping
     public Iterable<ProductDto> getAllProducts(
@@ -58,12 +61,21 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(
-        @RequestBody ProductDto request,
+        @RequestBody ProductDto productDto,
         UriComponentsBuilder uriBuilder) {
         
-        var product = productMapper.toEntity(request);
+        //Check if category exists
+        var category = categoryRepository.findById(productDto.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.notFound().build(); // Or throw an exception
+        }else if (category .getId() != productDto.getCategoryId()) {
+            return ResponseEntity.badRequest().build(); // Or throw an exception 
+            
+        }
+
+        // Create and save the product
+        var product = productMapper.toEntity(productDto);
         productsRepository.save(product);
-        var productDto = productMapper.toDto(product);
         var uri = uriBuilder.path("/products/{id}").buildAndExpand(product.getProductId()).toUri();
         return ResponseEntity.created(uri).body(productDto);
     
@@ -73,11 +85,21 @@ public class ProductController {
     public ResponseEntity<ProductDto> updateProduct(
         @PathVariable Long id,
         @RequestBody ProductDto request) {
-
+        
+        // Check if category exists
+        var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.notFound().build(); // Or throw an exception
+        }else if (category.getId() != request.getCategoryId()) {
+            return ResponseEntity.badRequest().build(); // Or throw an exception 
+            
+        }
         var product = productsRepository.findById(id).orElse(null);
         if (product == null) {
             return ResponseEntity.notFound().build(); // Or throw an exception
         }
+
+        // Update and save the product
         productMapper.updateEntity(request, product);
         productsRepository.save(product);
         return ResponseEntity.ok(productMapper.toDto(product));
