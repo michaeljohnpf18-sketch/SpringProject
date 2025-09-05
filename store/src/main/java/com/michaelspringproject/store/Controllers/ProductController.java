@@ -32,7 +32,6 @@ import lombok.experimental.var;
 public class ProductController {
     private final ProductsRepository productsRepository;    
     private final ProductMapper productMapper;
-    private final CategoryRepository categoryRepository;
 
     @GetMapping
     public Iterable<ProductDto> getAllProducts(
@@ -64,14 +63,6 @@ public class ProductController {
         @RequestBody ProductDto productDto,
         UriComponentsBuilder uriBuilder) {
         
-        //Check if category exists
-        var category = categoryRepository.findById(productDto.getCategoryId()).orElse(null);
-        if (category == null) {
-            return ResponseEntity.notFound().build(); // Or throw an exception
-        }else if (category .getId() != productDto.getCategoryId()) {
-            return ResponseEntity.badRequest().build(); // Or throw an exception 
-            
-        }
 
         // Create and save the product
         var product = productMapper.toEntity(productDto);
@@ -86,14 +77,6 @@ public class ProductController {
         @PathVariable Long id,
         @RequestBody ProductDto request) {
         
-        // Check if category exists
-        var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
-        if (category == null) {
-            return ResponseEntity.notFound().build(); // Or throw an exception
-        }else if (category.getId() != request.getCategoryId()) {
-            return ResponseEntity.badRequest().build(); // Or throw an exception 
-            
-        }
         var product = productsRepository.findById(id).orElse(null);
         if (product == null) {
             return ResponseEntity.notFound().build(); // Or throw an exception

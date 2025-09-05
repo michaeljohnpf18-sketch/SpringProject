@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -11,6 +13,7 @@ import jakarta.persistence.Table;
 public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "product_id")
     private long productId;
 
     @Column(name = "product_name")
@@ -22,19 +25,20 @@ public class Products {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "category_id")
-    private int categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     // Constructors
     public Products() {
     }
     
-    public Products(long productId, String productName, String description, double price, int categoryId) {
+    public Products(long productId, String productName, String description, double price, Category category) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
+        this.category = category;
         this.price = price;
-        this.categoryId = categoryId;
     }
 
     // Getters and Setters
@@ -63,11 +67,11 @@ public class Products {
     public void setPrice(double price) {
         this.price = price;
     }
-    public int getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
     
     
